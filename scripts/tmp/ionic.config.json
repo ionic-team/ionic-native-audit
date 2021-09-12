@@ -1,7 +1,0 @@
-{
-  "name": "plugin-project-template",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular"
-}

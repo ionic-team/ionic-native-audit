@@ -160,27 +160,44 @@ async function runInstallTest(plugin) {
 
   console.log(chalk`{blue.bold Running install test}`);
 
-  /*
-  console.log("Clearing tmp dir");
-  await rimraf("tmp");
-  await fs.promises.mkdir("tmp");
-  console.log("Copying template");
-  await fs.copySync("../plugin-project-template", "tmp/");
-  */
+  for (const p of plugins) {
+    await fs.copySync("../cordova-template", "cordova-template");
 
-  console.log("Installing dependencies");
-  shell.cd("tmp");
-  shell.exec("npm install");
+    shell.cd("cordova-template");
+    let result = {
+      plugin: p,
+      code: 0,
+      reason: "",
+    };
+    try {
+      console.log(chalk`{blue.bold Testing ${p}}`);
+      await installTest(p);
+      result.reason = "success";
+      console.log(chalk`{green.bold Success}`);
+    } catch (e) {
+      switch (e.message) {
+        case "install":
+          console.log(chalk`{red.bold Fail: install}`);
+          result.code = 1;
+          result.reason = "install";
+          break;
+        case "install-vars":
+          console.log(chalk`{red.bold Fail: variables}`);
+          result.code = 1;
+          result.reason = "install-vars";
+          break;
+        case "build":
+          console.log(chalk`{red.bold Fail: build}`);
+          result.code = 1;
+          result.reason = "build";
+          break;
+      }
+    }
 
-  /*
-  for (const plugin of plugins) {
-    await installTest(plugin);
+    shell.cd("../");
+    await rimraf("cordova-template");
   }
-  */
-  await installTest(plugins[0]);
 
-  shell.exec("npm run build");
-  shell.exec("ionic capacitor sync");
   /*
   const npmi = spawn("npm", ["install"]);
   npmi.stdout.on("data", function (data) {
@@ -207,9 +224,26 @@ async function installTest(plugin) {
   console.log(plugin, ionicNativePath);
 
   const package = pluginInfo.plugin;
-  console.log(chalk`{green.bold [install] {white ${package}}}`);
-  shell.exec(`npm install ${package}`);
-  shell.exec(`ionic capacitor update`);
+  console.log(
+    chalk`{green.bold [install] {white ${package} - ${pluginInfo.repo}}}`
+  );
+
+  var add = shell.exec(`cordova plugin add ${package}`);
+
+  if (add.stderr.indexOf("Variable(s) missing") >= 0) {
+    throw new Error("install-vars");
+  }
+
+  code = add.code;
+  if (code !== 0) {
+    throw new Error("install");
+  }
+
+  code = shell.exec(`cordova build`).code;
+
+  if (code !== 0) {
+    throw new Error("build");
+  }
 }
 
 (async function () {
