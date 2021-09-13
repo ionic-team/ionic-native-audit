@@ -239,7 +239,9 @@ async function installTest(plugin) {
     throw new Error("install");
   }
 
-  code = shell.exec(`cordova build`).code;
+  code = shell.exec(
+    `cordova build android -- --gradleArg=-PcdvBuildToolsVersion=30.0.3`
+  ).code;
 
   if (code !== 0) {
     throw new Error("build");
