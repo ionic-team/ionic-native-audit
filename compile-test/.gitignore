@@ -1,0 +1,5 @@
+node_modules/
+tmp-project/
+results/
+dist/check.js
+.DS_Store
