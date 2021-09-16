@@ -1,0 +1,29 @@
+{
+  "name": "ionic-native-inspect",
+  "version": "1.0.0",
+  "description": "Tests ionic-native plugins for compilation",
+  "main": "check.js",  
+  "scripts": {
+    "build": "rollup -c && node prepare.mjs && cp check.js dist",
+    "publish": "npm run build && cd dist && npm publish",
+    "test": "npm run build && node check",
+    "watch": "rollup -c -w"
+  },
+  "author": "support@ionic.io",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "~3.0.0",
+    "fast-xml-parser": "~3.19.0",
+    "semver": "~7.3.5",
+    "util": "~0.12.4"
+  },
+  "devDependencies": {
+    "@ionic/prettier-config": "~2.0.0",
+    "@rollup/plugin-commonjs": "~20.0.0",
+    "@rollup/plugin-node-resolve": "~13.0.4",
+    "husky": "~7.0.2",
+    "prettier": "~2.3.2",
+    "pretty-quick": "~3.1.1"
+  },
+  "prettier": "@ionic/prettier-config"
+}
